@@ -12,7 +12,7 @@ namespace DataAccess
         private static List<MemberObject> _memberList = new List<MemberObject>()
         {
             new MemberObject{MemberId = 1, MemberName = "Nguyen Huu Hieu", Password = "123456", Email = "hihihi@gmail.com", City = "HAI DUONG", Country = "VIET NAM"},
-            new MemberObject{MemberId = 2, MemberName = "Le Viet Hoang", Password = "123456", Email = "jakatar@gmail.com", City = "TP.HCM", Country = "VIET NAM"},
+            new MemberObject{MemberId = 2, MemberName = "Le Viet Hoang", Password = "123123", Email = "jakatar@gmail.com", City = "TP.HCM", Country = "VIET NAM"},
             new MemberObject{MemberId = 3, MemberName = "Henry Nguyen", Password = "1234567", Email = "henryfpt@gmail.com", City = "PRAGUE", Country = "CZECHIA"}
         };
         public List<MemberObject> GetMemberList => _memberList;
