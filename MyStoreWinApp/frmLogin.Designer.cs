@@ -73,7 +73,7 @@
             tbEmail.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             tbEmail.Name = "tbEmail";
             tbEmail.Size = new System.Drawing.Size(219, 27);
-            tbEmail.TabIndex = 3;
+            tbEmail.TabIndex = 0;
             // 
             // tbPassword
             // 
@@ -82,29 +82,30 @@
             tbPassword.Name = "tbPassword";
             tbPassword.PasswordChar = '*';
             tbPassword.Size = new System.Drawing.Size(219, 27);
-            tbPassword.TabIndex = 4;
+            tbPassword.TabIndex = 1;
             // 
             // btLogin
             // 
             btLogin.BackColor = System.Drawing.Color.WhiteSmoke;
-            btLogin.Location = new System.Drawing.Point(180, 171);
+            btLogin.DialogResult = System.Windows.Forms.DialogResult.OK;
+            btLogin.Location = new System.Drawing.Point(60, 175);
             btLogin.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             btLogin.Name = "btLogin";
-            btLogin.Size = new System.Drawing.Size(83, 25);
-            btLogin.TabIndex = 5;
-            btLogin.Text = "Login";
+            btLogin.Size = new System.Drawing.Size(83, 36);
+            btLogin.TabIndex = 2;
+            btLogin.Text = "&Login";
             btLogin.UseVisualStyleBackColor = false;
             btLogin.Click += btLogin_Click;
             // 
             // btQuit
             // 
             btQuit.BackColor = System.Drawing.Color.WhiteSmoke;
-            btQuit.Location = new System.Drawing.Point(46, 171);
+            btQuit.Location = new System.Drawing.Point(190, 175);
             btQuit.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             btQuit.Name = "btQuit";
-            btQuit.Size = new System.Drawing.Size(83, 25);
-            btQuit.TabIndex = 6;
-            btQuit.Text = "Quit";
+            btQuit.Size = new System.Drawing.Size(83, 36);
+            btQuit.TabIndex = 3;
+            btQuit.Text = "Close";
             btQuit.UseVisualStyleBackColor = false;
             btQuit.Click += btQuit_Click;
             // 
@@ -112,7 +113,7 @@
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            ClientSize = new System.Drawing.Size(333, 222);
+            ClientSize = new System.Drawing.Size(315, 248);
             Controls.Add(btQuit);
             Controls.Add(btLogin);
             Controls.Add(tbPassword);

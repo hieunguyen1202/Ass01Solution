@@ -37,7 +37,6 @@ namespace MyStoreWinApp
                 AdminForm.Show();
                 return;
             }
-
         }
 
             private void frmLogin_Load(object sender, EventArgs e)

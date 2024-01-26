@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Configuration;
 using System.Data;
 using System.Drawing;
 using System.Linq;
@@ -93,28 +94,35 @@ namespace MyStoreWinApp
                 grMemberList.DataSource = filteredList;
             }
         }
-
         private void btNewMember_Click(object sender, EventArgs e)
         {
-            var MemberId = Convert.ToInt32(tbMemberId.Text);
-            var MemberName = tbMemberName.Text.ToUpper();
-            var MemberPassword = tbMemberPassword.Text;
-            var MemberEmail = tbMemberEmail.Text;
-            var MemberCity = tbMemberCity.Text.ToUpper();
-            var MemberCountry = tbMemberCountry.Text.ToUpper();
-            try
-            {
-                MemberObject NewMember = new MemberObject { MemberId = MemberId, MemberName = MemberName, Password = MemberPassword, Email = MemberEmail, City = MemberCity, Country = MemberCountry };
-                memberRepository.AddNewMember(NewMember);
-                var MemberList = memberRepository.GetAllMembers();
-                RefreshDataInForm(MemberList);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
-        }
+                var MemberIdText = tbMemberId.Text;
+                if (String.IsNullOrEmpty(MemberIdText) || String.IsNullOrWhiteSpace(MemberIdText))
+                {
+                    MessageBox.Show("Please enter member ID");
+                }
+                else
+                {
+                    var MemberId = Convert.ToInt32(tbMemberId.Text);
+                    var MemberName = tbMemberName.Text.ToUpper();
+                    var MemberPassword = tbMemberPassword.Text;
+                    var MemberEmail = tbMemberEmail.Text;
+                    var MemberCity = tbMemberCity.Text.ToUpper();
+                    var MemberCountry = tbMemberCountry.Text.ToUpper();
 
+                    try
+                    {
+                        MemberObject NewMember = new MemberObject { MemberId = MemberId, MemberName = MemberName, Password = MemberPassword, Email = MemberEmail, City = MemberCity, Country = MemberCountry };
+                        memberRepository.AddNewMember(NewMember);
+                        var MemberList = memberRepository.GetAllMembers();
+                        RefreshDataInForm(MemberList);
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show(ex.Message);
+                    }
+                }
+            }
         private void btDeleteMember_Click(object sender, EventArgs e)
         {
             try
