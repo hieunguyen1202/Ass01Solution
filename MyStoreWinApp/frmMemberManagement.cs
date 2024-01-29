@@ -16,13 +16,15 @@ namespace MyStoreWinApp
 
     public partial class frmMemberManagement : Form
     {
-        private IMemberRepository memberRepository;
+        //private IMemberRepository memberRepository;
         public frmMemberManagement()
         {
             InitializeComponent();
             memberRepository = new MemberRepository();
         }
 
+        IMemberRepository memberRepository = new MemberRepository();
+        BindingSource source;
         private void ClearText()
         {
             tbMemberId.Clear();
@@ -47,32 +49,53 @@ namespace MyStoreWinApp
 
         private void frmMemberManagement_Load(object sender, EventArgs e)
         {
-            var memberList = memberRepository.GetAllMembers();
-            grMemberList.DataSource = memberList;
-            grMemberList.Columns[0].HeaderText = "Id";
-            grMemberList.Columns[1].HeaderText = "Name";
-            grMemberList.Columns[2].HeaderText = "Email";
-            grMemberList.Columns[3].HeaderText = "Password";
-            grMemberList.Columns[4].HeaderText = "City";
-            grMemberList.Columns[5].HeaderText = "Country";
-            cbFilterCity.DataSource = memberList.Select(q => q.City.ToUpper()).Distinct().ToList();
-            cbFilterCountry.DataSource = memberList.Select(q => q.Country.ToUpper()).Distinct().ToList();
-            grMemberList.AllowUserToAddRows = false; // mất dòng tự tạo ở thuộc tính này , chỉnh về false để chỉ hiện ra data
+
+            //grMemberList.Columns[0].HeaderText = "Id";
+            //grMemberList.Columns[1].HeaderText = "Name";
+            //grMemberList.Columns[2].HeaderText = "Email";
+            //grMemberList.Columns[3].HeaderText = "Password";
+            //grMemberList.Columns[4].HeaderText = "City";
+            //grMemberList.Columns[5].HeaderText = "Country";
+ 
+
+            // mất dòng tự tạo ở thuộc tính này , chỉnh về false để chỉ hiện ra data
+            btDeleteMember.Enabled = false;
+            grMemberList.CellDoubleClick += grMemberList_CellContentClick;
+            grMemberList.AllowUserToAddRows = false;
+            //var memberList = memberRepository.GetAllMembers();
+            //grMemberList.DataSource = memberList;
+            //cbFilterCity.DataSource = memberList.Select(q => q.City.ToUpper()).Distinct().ToList();
+            //cbFilterCountry.DataSource = memberList.Select(q => q.Country.ToUpper()).Distinct().ToList();
         }
 
         private void btSearch_Click(object sender, EventArgs e)
         {
-            var searchId = tbSearchId.Text.ToUpper();
-            var searchName = tbSearchName.Text.ToUpper();
-            if (String.IsNullOrWhiteSpace(searchId) || String.IsNullOrEmpty(searchId) ||
-                String.IsNullOrWhiteSpace(searchName) || String.IsNullOrEmpty(searchName))
+            var searchId = tbSearchId.Text.Trim();
+            var searchName = tbSearchName.Text.Trim();
+
+            if (string.IsNullOrWhiteSpace(searchId) || string.IsNullOrWhiteSpace(searchName))
             {
                 MessageBox.Show("Please enter id and Name");
             }
             else
             {
+                int memberId;
+                bool isIdValid = int.TryParse(searchId, out memberId);
 
-                var member = memberRepository.getMemberByIdAndName(Convert.ToInt32(searchId), searchName);
+                if (!isIdValid)
+                {
+                    MessageBox.Show("Invalid Id");
+                    return;
+                }
+
+                var member = memberRepository.getMemberByIdAndName(memberId, searchName.ToUpper());
+
+                if (member == null)
+                {
+                    MessageBox.Show("Member not found");
+                    return;
+                }
+
                 BindingSource bindingSource = new BindingSource();
                 bindingSource.DataSource = member;
                 grMemberList.DataSource = bindingSource;
@@ -81,10 +104,10 @@ namespace MyStoreWinApp
 
         private void btFilter_Click(object sender, EventArgs e)
         {
-            var city = cbFilterCity.SelectedItem.ToString().ToUpper();
-            var country = cbFilterCountry.SelectedItem.ToString().ToUpper();
-            if (String.IsNullOrWhiteSpace(city) || String.IsNullOrEmpty(city) ||
-                String.IsNullOrWhiteSpace(country) || String.IsNullOrEmpty(country))
+            var city = cbFilterCity.SelectedItem?.ToString().ToUpper();
+            var country = cbFilterCountry.SelectedItem?.ToString().ToUpper();
+
+            if (string.IsNullOrWhiteSpace(city) || string.IsNullOrWhiteSpace(country))
             {
                 MessageBox.Show("Please select City and Country");
             }
@@ -96,90 +119,59 @@ namespace MyStoreWinApp
         }
         private void btNewMember_Click(object sender, EventArgs e)
         {
-                var MemberIdText = tbMemberId.Text;
-                if (String.IsNullOrEmpty(MemberIdText) || String.IsNullOrWhiteSpace(MemberIdText))
-                {
-                    MessageBox.Show("Please enter member ID");
-                }
-                else
-                {
-                    var MemberId = Convert.ToInt32(tbMemberId.Text);
-                    var MemberName = tbMemberName.Text.ToUpper();
-                    var MemberPassword = tbMemberPassword.Text;
-                    var MemberEmail = tbMemberEmail.Text;
-                    var MemberCity = tbMemberCity.Text.ToUpper();
-                    var MemberCountry = tbMemberCountry.Text.ToUpper();
-
-                    try
-                    {
-                        MemberObject NewMember = new MemberObject { MemberId = MemberId, MemberName = MemberName, Password = MemberPassword, Email = MemberEmail, City = MemberCity, Country = MemberCountry };
-                        memberRepository.AddNewMember(NewMember);
-                        var MemberList = memberRepository.GetAllMembers();
-                        RefreshDataInForm(MemberList);
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show(ex.Message);
-                    }
-                }
+            frmMemberDetails frmCarDetails = new frmMemberDetails
+            {
+                Text = "Add new member",
+                InsertOrUpdate = false,
+                MemberRepository = memberRepository
+            };
+            if (frmCarDetails.ShowDialog() == DialogResult.OK)
+            {
+                LoadMemberList();
+                source.Position = source.Count - 1;
             }
+
+        }
+       
+
+        private void ClearDataBindings()
+        {
+            tbMemberId.DataBindings.Clear();
+            tbMemberPassword.DataBindings.Clear();
+            tbMemberEmail.DataBindings.Clear();
+            tbMemberCity.DataBindings.Clear();
+            tbMemberName.DataBindings.Clear();
+            tbMemberCountry.DataBindings.Clear();
+        }
+
+        private void BindDataControls()
+        {
+            tbMemberId.DataBindings.Add("Text", source, "MemberId");
+            tbMemberPassword.DataBindings.Add("Text", source, "Password");
+            tbMemberEmail.DataBindings.Add("Text", source, "Email");
+            tbMemberCity.DataBindings.Add("Text", source, "City");
+            tbMemberName.DataBindings.Add("Text", source, "MemberName");
+            tbMemberCountry.DataBindings.Add("Text", source, "Country");
+        }
+
+    
+   
         private void btDeleteMember_Click(object sender, EventArgs e)
         {
+
             try
             {
-                string MemberIdText = tbMemberId.Text;
-                if (String.IsNullOrEmpty(MemberIdText) || String.IsNullOrWhiteSpace(MemberIdText))
-                {
-                    MessageBox.Show("Please enter member ID");
-                }
-                else
-                {
-                    var MemberId = Convert.ToInt32(MemberIdText);
-                    memberRepository.DeleteMember(MemberId);
-                    RefreshDataInForm(memberRepository.GetAllMembers());
-                }
+                var member = GetMemberObject();
+                memberRepository.DeleteMember(member.MemberId);
+                LoadMemberList();
             }
-            catch (Exception exception)
+            catch (Exception ex)
             {
-                MessageBox.Show(exception.Message);
+                MessageBox.Show(ex.Message, "Delete a member");
             }
         }
 
-        private void btUpdateMember_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                var MemberIdText = tbMemberId.Text;
-                if (String.IsNullOrEmpty(MemberIdText) || String.IsNullOrWhiteSpace(MemberIdText))
-                {
-                    MessageBox.Show("Please enter member ID");
-                }
-                else
-                {
-                    var MemberId = Convert.ToInt32(MemberIdText);
-                    var MemberName = tbMemberName.Text.ToUpper() == "" ? null : tbMemberName.Text;
-                    var MemberPassword = tbMemberPassword.Text == "" ? null : tbMemberPassword.Text;
-                    var MemberEmail = tbMemberEmail.Text == "" ? null : tbMemberEmail.Text;
-                    var MemberCity = tbMemberCity.Text.ToUpper() == "" ? null : tbMemberCity.Text.ToUpper();
-                    var MemberCountry = tbMemberCountry.Text.ToUpper() == "" ? null : tbMemberCountry.Text.ToUpper();
-                    memberRepository.UpdateMember(new MemberObject
-                    {
-                        MemberId = MemberId,
-                        MemberName = MemberName,
-                        Password = MemberPassword,
-                        Email = MemberEmail,
-                        City = MemberCity,
-                        Country = MemberCountry
-                    });
-                    RefreshDataInForm(memberRepository.GetAllMembers());
-                }
-            }
-            catch (Exception exception)
-            {
-                MessageBox.Show(exception.Message);
-            }
 
-        }
 
         private void chbSort_CheckedChanged(object sender, EventArgs e)
         {
@@ -198,24 +190,106 @@ namespace MyStoreWinApp
             }
         }
 
-        private void btClose_Click(object sender, EventArgs e)
-        {
-            this.Close();
-        }
+        private void btClose_Click(object sender, EventArgs e) => Close();
 
-        private void panel1_Paint(object sender, PaintEventArgs e)
-        {
-
-        }
-
-        private void panel3_Paint(object sender, PaintEventArgs e)
-        {
-
-        }
 
         private void grMemberList_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
-
+            frmMemberDetails frmCarDetails = new frmMemberDetails
+            {
+                Text = "Update car",
+                InsertOrUpdate = true,
+                memberInfo = GetMemberObject(),
+                MemberRepository = memberRepository
+            };
+            if (frmCarDetails.ShowDialog() == DialogResult.OK)
+            {
+                LoadMemberList();
+                source.Position = source.Count - 1;
+            }
         }
+        private MemberObject GetMemberObject()
+        {
+            MemberObject member = new MemberObject(); // Initialize with a default instance
+            try
+            {
+                member = new MemberObject
+                {
+                    MemberId = int.Parse(tbMemberId.Text),
+                    MemberName = tbMemberName.Text,
+                    Password = tbMemberPassword.Text,
+                    Email = tbMemberEmail.Text,
+                    City = tbMemberCity.Text,
+                    Country = tbMemberCountry.Text,
+                };
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Get member");
+            }
+            return member;
+        }
+
+        private void btnLoad_Click(object sender, EventArgs e)
+        {
+            List<MemberObject> memberList = LoadMemberList();
+            cbFilterCity.DataSource = memberList.Select(q => q.City.ToUpper()).Distinct().ToList();
+            cbFilterCountry.DataSource = memberList.Select(q => q.Country.ToUpper()).Distinct().ToList();
+        }
+        private List<BusinessObject.MemberObject> LoadMemberList()
+        {
+            try
+            {
+                var members = memberRepository.GetAllMembers();
+
+                source = new BindingSource();
+                source.DataSource = members;
+
+                ClearDataBindings();
+
+                BindDataControls();
+
+                grMemberList.DataSource = null;
+                grMemberList.DataSource = source;
+
+                btDeleteMember.Enabled = (members.Count > 0);
+
+                return members; // Return the member list
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Load member list");
+                return new List<BusinessObject.MemberObject>(); // Return an empty list in case of an error
+            }
+        }
+        //public void LoadMemberList()
+        //{
+        //    try
+        //    {
+        //        var members = memberRepository.GetAllMembers();
+
+        //        source = new BindingSource();
+        //        source.DataSource = members;
+
+        //        ClearDataBindings();
+
+        //        BindDataControls();
+
+        //        grMemberList.DataSource = null;
+        //        grMemberList.DataSource = source;
+
+        //        btDeleteMember.Enabled = (members.Count > 0);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        MessageBox.Show(ex.Message, "Load member list");
+        //    }
+        //}
+
+        //public bool IsAddNewEnabled
+        //{
+        //    get { return btNewMember.Enabled; }
+        //    set { btNewMember.Enabled = value; }
+        //}
     }
 }

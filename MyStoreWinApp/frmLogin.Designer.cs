@@ -50,20 +50,20 @@
             // Email
             // 
             Email.AutoSize = true;
-            Email.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            Email.Font = new System.Drawing.Font("Segoe UI Light", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             Email.Location = new System.Drawing.Point(10, 99);
             Email.Name = "Email";
-            Email.Size = new System.Drawing.Size(47, 20);
+            Email.Size = new System.Drawing.Size(42, 20);
             Email.TabIndex = 1;
             Email.Text = "Email";
             // 
             // label2
             // 
             label2.AutoSize = true;
-            label2.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            label2.Font = new System.Drawing.Font("Segoe UI Light", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             label2.Location = new System.Drawing.Point(10, 129);
             label2.Name = "label2";
-            label2.Size = new System.Drawing.Size(76, 20);
+            label2.Size = new System.Drawing.Size(66, 20);
             label2.TabIndex = 2;
             label2.Text = "Password";
             // 
@@ -111,9 +111,10 @@
             // 
             // frmLogin
             // 
+            AcceptButton = btLogin;
             AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            ClientSize = new System.Drawing.Size(315, 248);
+            ClientSize = new System.Drawing.Size(333, 260);
             Controls.Add(btQuit);
             Controls.Add(btLogin);
             Controls.Add(tbPassword);

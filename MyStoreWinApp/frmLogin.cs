@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Windows.Forms;
 using BusinessObject;
 using DataAccess.Repository;
@@ -11,7 +12,8 @@ namespace MyStoreWinApp
     public partial class frmLogin : Form
     {
         private IMemberRepository memberRepository;
-        private AdminObject admin;
+        //private AdminObject admin;
+        private UserObject user;
         public frmLogin()
         {
             InitializeComponent();
@@ -29,23 +31,38 @@ namespace MyStoreWinApp
                 return;
             }
 
-            if (Email.Equals(admin.adminEmail) && Password.Equals(admin.adminPassword))
+            UserObject user = UserObject.listAccount.FirstOrDefault(u => u.Email == Email && u.Password == Password);
+
+            if (user == null)
+            {
+                MessageBox.Show("Invalid Email or Password!!");
+                return;
+            }
+
+            if (user.IsAdmin)
             {
                 this.Hide();
                 frmMemberManagement AdminForm = new frmMemberManagement();
                 AdminForm.Closed += (sender, e) => this.Close();
                 AdminForm.Show();
-                return;
+            }
+            else
+            {
+                frmMemberManagement userForm = new frmMemberManagement();
+                userForm.Closed += (sender, e) => this.Close();
+                userForm.btNewMember.Hide(); // Hide the "Add New" button for non-admin users
+                userForm.btDeleteMember.Hide(); // Hide the "Add New" button for non-admin users
+                userForm.Show();
             }
         }
 
-            private void frmLogin_Load(object sender, EventArgs e)
-            {
+        private void frmLogin_Load(object sender, EventArgs e)
+        {
 
-                using StreamReader streamReader = new StreamReader(@"D:\PRN211\MyCode\Assignment01\Ass01Solution\appsettings.json");
-                string json = streamReader.ReadToEnd();
-                admin = JsonConvert.DeserializeObject<AdminObject>(json);
-            }
+            //using StreamReader streamReader = new StreamReader(@"D:\PRN211\MyCode\Assignment01\Ass01Solution\appsettings.json");
+            //string json = streamReader.ReadToEnd();
+            //admin = JsonConvert.DeserializeObject<AdminObject>(json);
+        }
 
         private void btQuit_Click(object sender, EventArgs e)
         {

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.ConstrainedExecution;
 using BusinessObject;
 
 
@@ -115,20 +116,15 @@ namespace DataAccess
         public void UpdateMemberInfo(MemberObject UpdateMember)
         {
             var member = GetMemberById(UpdateMember.MemberId);
-            if (member == null)
+            if (member != null)
             {
-                throw new Exception("Member does not exist!!");
+                var index = _memberList.IndexOf(member);
+                _memberList[index] = UpdateMember;
             }
-
-            if (CheckduplicatedEmail(UpdateMember.Email))
+            else
             {
-                throw new Exception("Email is already existed!!");
+                throw new Exception("Member does not already exist.");
             }
-            member.MemberName = UpdateMember.MemberName ??= member.MemberName;
-            member.Email = UpdateMember.Email ??= member.Email;
-            member.Password = UpdateMember.Password ??= member.Password;
-            member.City = UpdateMember.City ??= member.City;
-            member.Country = UpdateMember.Country ??= member.Country;
         }
     }
 }
